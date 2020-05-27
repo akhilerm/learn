@@ -5,3 +5,9 @@ q1:
 
 spdk:
 	@gcc spdk.c -o bin/dev_in_use
+
+excl:
+	@gcc excl.c -o bin/excl
+
+blkid:
+	@gcc blkid.c -o bin/blkid -lblkid
