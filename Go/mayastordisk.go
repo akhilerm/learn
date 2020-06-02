@@ -62,7 +62,7 @@ func main()  {
 	/*var spdkblob *C.char
 	spdkblob = C.CString("SPDKBLOB")*/
 
-	var spdk *C.spdk_bs_super_block
+	var spdk C.spdk_bs_super_block
 
 	f, err := os.Open(dev)
 	if err != nil {
@@ -75,7 +75,7 @@ func main()  {
 		return
 	}
 
-	err = binary.Read(f, binary.BigEndian, spdk)
+	err = binary.Read(f, binary.BigEndian, &spdk)
 	if err != nil {
 		fmt.Println("error reading", err)
 		return
@@ -86,8 +86,6 @@ func main()  {
 	s := C.GoString(ptr)*/
 
 	fmt.Println(spdk.signature)
-
-
 
 }
 
