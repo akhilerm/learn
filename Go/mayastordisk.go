@@ -5,18 +5,19 @@ package main
 
 /*
  #cgo LDFLAGS: -lblkid
-#include "blkid/blkid.h"
 #include "string.h"
 #include "stdlib.h"
+#include "stdint.h"
+
+#define SPDK_BLOBSTORE_TYPE_LENGTH 16
 
 typedef uint64_t spdk_blob_id;
-typedef unsigned long long int var64;
 
-struct spdk_bs_type {
+typedef struct {
         char bstype[SPDK_BLOBSTORE_TYPE_LENGTH];
-};
+}spdk_bs_type;
 
-struct spdk_bs_super_block {
+typedef struct  {
         uint8_t         signature[8];
         uint32_t        version;
         uint32_t        length;
@@ -34,7 +35,7 @@ struct spdk_bs_super_block {
 		uint32_t        md_start;
 		uint32_t        md_len;
 
-		struct spdk_bs_type     bstype;
+		spdk_bs_type     bstype;
 
 		uint32_t        used_blobid_mask_start;
 		uint32_t        used_blobid_mask_len;
@@ -44,21 +45,49 @@ struct spdk_bs_super_block {
 
 		uint8_t         reserved[4000];
 		uint32_t        crc;
-};
+}spdk_bs_super_block;
 */
 import "C"
 import (
+	"encoding/binary"
 	"fmt"
+	"io"
 	"os"
-	"unsafe"
 )
 
-const (
-	ZFS_FILESYSTEM = "zfs_member"
-	BLKID_FS_TYPE = "TYPE"
-)
 
 func main()  {
+	dev := os.Args[1]
+
+	/*var spdkblob *C.char
+	spdkblob = C.CString("SPDKBLOB")*/
+
+	var spdk *C.spdk_bs_super_block
+
+	f, err := os.Open(dev)
+	if err != nil {
+		fmt.Println("error opning", err)
+		return
+	}
+	_, err = f.Seek(0, io.SeekStart)
+	if err != nil {
+		fmt.Println("error seeking", err)
+		return
+	}
+
+	err = binary.Read(f, binary.BigEndian, spdk)
+	if err != nil {
+		fmt.Println("error reading", err)
+		return
+	}
+
+/*	var ptr *C.char
+	ptr = (*C.char)(spdk.signature[0])
+	s := C.GoString(ptr)*/
+
+	fmt.Println(spdk.signature)
+
+
 
 }
 
